@@ -1,39 +1,32 @@
-var express = require("express");
+var db = require("../models")
 
-var router = express.Router();
+module.exports = function(app) {
 
-var burger = require("../models/burger.js");
-
-router.get("/", function(req, res) {
-	burger.all(function(data) {
-		var hbsObject = {
-			burger: data
-		};
-		console.log(hbsObject);
-		res.render("index", hbsObject);
+	app.get("/", function(req, res) {
+		db.burgers.findAll({}).then(function(dbBurgers) {
+			res.json(dbBurgers)
+		});
 	});
-});
 
-router.post("/", function(req, res) {
-	console.log(req.body.name)
-	burger.create([
-		"burger_name", "devoured"
-	], [
-		req.body.name, 0
-	], function() {
-		console.log("test2")
-		res.redirect("/");
+	app.post("/", function(req, res) {
+		console.log(req.body.name)
+		burger.create([
+			"burger_name", "devoured"
+		], [
+			req.body.name, 0
+		], function() {
+			console.log("test2")
+			res.redirect("/");
+		});
 	});
-});
 
-router.put("/:id", function(req, res) {
-	var condition = "id = " + req.params.id;
-	console.log("condition", condition);
-	burger.update({
-		devoured: req.body.devoured
-	}, condition, function() {
-		res.redirect("/");
+	app.put("/:id", function(req, res) {
+		var condition = "id = " + req.params.id;
+		console.log("condition", condition);
+		burger.update({
+			devoured: req.body.devoured
+		}, condition, function() {
+			res.redirect("/");
+		});
 	});
-});
-
-module.exports = router;
+}
